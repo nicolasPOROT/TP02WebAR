@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>AR avec UI</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+        body { margin:0; overflow:hidden; font-family: sans-serif; }
+        #ui {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: none;
+            text-align: center;
+            pointer-events: auto;
+            z-index: 10;
+        }
+        #ui input[type="range"] { width: 200px; }
+        #colorButtons button {
+            width: 30px; height: 30px; margin: 0 5px; border: none; cursor: pointer;
+        }
+        a-scene {
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div id="ui">
+    <div>
+        <label for="sizeSlider">Taille :</label>
+        <input type="range" id="sizeSlider" min="0.1" max="3" step="0.1" value="1">
+    </div>
+    <div id="colorButtons">
+        <button style="background:red;" data-color="red"></button>
+        <button style="background:green;" data-color="green"></button>
+        <button style="background:blue;" data-color="blue"></button>
+    </div>
+</div>
+
+<a-scene embedded arjs>
+    <a-marker preset="hiro" id="hiroMarker">
+        <a-box id="box" position="0 0.5 0" color="red" scale="1 1 1"></a-box>
+    </a-marker>
+    <a-entity camera>
+        <a-cursor fuse="false" rayOrigin="mouse"></a-cursor>
+    </a-entity>
+</a-scene>
+
+<script>
+    const ui = document.getElementById('ui');
+    const marker = document.getElementById('hiroMarker');
+    const box = document.getElementById('box');
+    const slider = document.getElementById('sizeSlider');
+    const colorButtons = document.querySelectorAll('#colorButtons button');
+
+    // Afficher/masquer l'UI selon le marker
+    marker.addEventListener('markerFound', () => {
+        ui.style.display = 'block';
+    });
+    marker.addEventListener('markerLost', () => {
+        ui.style.display = 'none';
+    });
+
+    // Changer la taille de la boîte en temps réel
+    slider.addEventListener('input', () => {
+        const val = parseFloat(slider.value);
+        box.setAttribute('scale', `${val} ${val} ${val}`);
+    });
+
+    // Changer la couleur au clic
+    colorButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const color = btn.getAttribute('data-color');
+            box.setAttribute('color', color);
+        });
+    });
+</script>
+</body>
+</html>
